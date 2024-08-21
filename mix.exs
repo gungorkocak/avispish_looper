@@ -82,9 +82,11 @@ defmodule NervesLivebook.MixProject do
       {:blue_heron, "~> 0.4", targets: @ble_targets},
       {:blue_heron_transport_uart, "~> 0.1.4", targets: @ble_targets},
       {:bmp280, "~> 0.2", targets: @all_targets},
-      {:circuits_gpio, "~> 2.0 or ~> 1.0"},
       {:circuits_i2c, "~> 2.0 or ~> 1.0"},
-      {:circuits_spi, "~> 2.0 or ~> 1.0"},
+      {:circuits_gpio, "~> 2.0 or ~> 1.0", override: true},
+      {:circuits_spi, "~> 2.0 or ~> 1.2", override: true},
+      # {:circuits_gpio, "~> 1.0"},
+      # {:circuits_spi, "~> 1.2"},
       {:circuits_uart, "~> 1.3"},
       {:delux, "~> 0.2"},
       # hts221 needs circuits_i2c dependency bumped
@@ -129,8 +131,12 @@ defmodule NervesLivebook.MixProject do
       # Compile-time only
       {:credo, "~> 1.6", only: :dev, runtime: false},
       {:dialyxir, "~> 1.3", only: :dev, runtime: false},
-      {:ex_doc, "~> 0.22", only: :docs, runtime: false}
+      {:ex_doc, "~> 0.22", only: :docs, runtime: false},
       # {:sbom, "~> 0.6", only: :dev, runtime: false}
+
+      # Custom dependencies
+      {:st7789_elixir, "~> 0.1.5"},
+      {:evision, "~> 0.2.8"}
     ]
   end
 

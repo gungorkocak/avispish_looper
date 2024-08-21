@@ -13,7 +13,7 @@ config :nerves, :firmware,
 if Mix.env() != :test do
   # Set log level to warning by default to reduce output except for testing
   # The unit tests rely on info level log messages.
-  config :logger, level: :warning
+  config :logger, level: :info
 end
 
 # Set the SOURCE_DATE_EPOCH date for reproducible builds.
