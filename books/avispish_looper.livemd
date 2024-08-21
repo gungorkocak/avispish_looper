@@ -1,4 +1,4 @@
-<!-- livebook:{"app_settings":{"slug":"avispish-looper"}} -->
+<!-- livebook:{"app_settings":{"show_source":true,"slug":"avispish-looper"}} -->
 
 # 👽 AvispishLooper
 
@@ -34,12 +34,37 @@ import Kino.Shorts
 ## 📺 Run
 
 ```elixir
+desc_load =
+  Kino.Markdown.new("""
+  ### 📲 How to load a new sequence?
+
+  1. Make sure you have 240px width x 280px height for your video.
+  2. Split your frames into jpg files. Frames need to be sorted. e.g. use incremental numbers, img001.jpg, img002.jpg etc.
+  4. Zip all of them together. (do not zip the directory, but all the frame files)
+  5. Choose **Load** tab and select your zip file. After selecting, wait a bit to see the filename, it takes a bit of a time, some times couple of tries.
+  6. Press **Load**.
+  7. After some seconds, you should see `load: :ok` in logs.
+""")
+
+desc_control = Kino.Markdown.new("""
+  ### 🎛️ How to control the sequence?
+
+  1. Select **Controls** tab.
+  2. You should see buttons like "Start", "Restart", "Play" and "Pause".
+  3. Start only works when the display is not started before.
+  4. Try them. You sould see corresponding logs.
+""")
+
+desc = Kino.Layout.grid([desc_load, desc_control], columns: 2)
+
 start_button = Kino.Control.button("🚀 Start")
 restart_button = Kino.Control.button("🔄 Restart")
 play_button = Kino.Control.button("▶️ Play")
 pause_button = Kino.Control.button("⏸️ Pause")
 
-player_controls = Kino.Layout.grid([start_button, restart_button, play_button, pause_button], columns: 4, boxed: true)
+cont_g1 = Kino.Layout.grid([start_button, restart_button], columns: 2, boxed: true, gap: 1)
+cont_g2 = Kino.Layout.grid([play_button, pause_button], columns: 2, boxed: true, gap: 1)
+player_controls = Kino.Layout.grid([cont_g1, cont_g2], columns: 2)
 
 load_form = Kino.Control.form([seq_file: Kino.Input.file("Seq File", accept: [".zip"])], submit: "Load")
 
@@ -60,8 +85,8 @@ Kino.listen(restart_button, fn %{type: :click} -> IO.puts("stop: #{inspect(Avisp
 Kino.listen(play_button, fn %{type: :click} -> IO.puts("play: #{inspect(AvispishLooper.play())}") end)
 Kino.listen(pause_button, fn %{type: :click} -> IO.puts("pause: #{inspect(AvispishLooper.pause())}") end)
 
-tabs
+Kino.Layout.grid([desc, tabs], columns: 1)
 
 ```
 
-<!-- livebook:{"offset":1794,"stamp":{"token":"XCP.S0CKamjH4uOoWuWBuefsch5Mlx_SfcOnIrCFTGj85S-bGlT2lhX8dVxRjqDUC3_vQT0sFa4hknv5J6YmBIfdgWksYiZyUnUXUpYuZk7d23aJVCBGzPB3r40","version":2}} -->
+<!-- livebook:{"offset":2936,"stamp":{"token":"XCP.JgHZ1i6vrCOZwkWoKhjLwYOYQ_CMjqFUNYiOVfI8ClrmxfsLUh-Ll7Ruzca7KVTT0SAK3TJjJ8qaN_6uRJLOUSSHFe-8zoV47eSuOUJ3zoEWFsGqIgCTTIg","version":2}} -->
