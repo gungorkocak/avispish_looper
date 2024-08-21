@@ -13,7 +13,7 @@ defmodule NervesLivebook.RedirectNervesLocal do
   @impl Plug
   def call(conn, _opts) do
     # Redirect nerves.local to the preferred hostname advertised over mDNS
-    if conn.host == "nerves.local" do
+    if conn.host == "avispish.local" do
       {:ok, hostname} = :inet.gethostname()
 
       url =
