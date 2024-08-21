@@ -1,4 +1,4 @@
-<!-- livebook:{"app_settings":{"slug":"avispish-looper"},"file_entries":[{"name":"avispish_loop_1.zip","type":"attachment"},{"name":"avispish_loop_2.zip","type":"attachment"},{"name":"img1.jpg","type":"attachment"},{"name":"octopus-and-crab.mp4","type":"attachment"}]} -->
+<!-- livebook:{"app_settings":{"slug":"avispish-looper"}} -->
 
 # 👽 AvispishLooper
 
@@ -12,13 +12,6 @@ Mix.install([
 
 ## 🤔 Plan
 
-### Questions
-
-* Is fps enough?
-* Should we make it running after restart?
-* How do we setup wifi for the tool?
-* How to properly stop the screen and restart again without closing the session?
-
 ### TODOs
 
 * [x] Make display work
@@ -27,163 +20,26 @@ Mix.install([
 * [x] Add Loop, start, stop UI controls
 * [x] Optimize fps as much as possible
 * [x] Basic UI controls for start, stop etc
-* [ ] Optimize UI with form controls
+* [x] Optimize UI with form controls
 * [ ] Deploy UI apps locally
-* [ ] Restart or start display multiple times
+* [x] Restart or start display multiple times
 
 ## 🏗️ Build
 
 ```elixir
 import IEx.Helpers
 import Kino.Shorts
-
-alias Evision, as: CV
-```
-
-```elixir
-# defmodule AvispishLooper do
-#   alias Evision, as: CV
-
-#   # Product:   https://www.waveshare.com/wiki/1.69inch_LCD_Module
-#   # Datasheet: https://files.waveshare.com/upload/c/c9/ST7789V2.pdf
-#   @waveshare_169_display_opts [
-#     port: 0,
-#     cs: 0,
-#     rst: 27,
-#     dc: 25,
-#     backlight: 18,
-#     width: 280,
-#     height: 240,
-#     speed_hz: 120 * 1000 * 1000,
-#     invert: false,
-#     offset_left: 20
-#   ]
-
-#   @seq_dir Path.join(__DIR__, "files/avispish_looper")
-
-#   def create_display(opts \\ []) do
-#     opts
-#     |> Keyword.validate!(@waveshare_169_display_opts)
-#     |> ST7789.new()
-#   end
-
-#   def load_seq(file_name) do
-#     File.rm_rf!(@seq_dir)
-#     File.mkdir_p!(@seq_dir)
-
-#     seq_zip = Path.join(__DIR__, "files/#{file_name}.zip")
-
-#     {:ok, seq_frames} =
-#       seq_zip
-#       |> to_charlist()
-#       |> :zip.unzip([{:cwd, to_charlist(@seq_dir)}])
-
-#     seq_frames
-#     |> Enum.map(&to_string/1)
-#   end
-
-#   def start(display, seq) do
-#     Process.spawn(
-#       fn ->
-#         IO.puts("Avispish: Loading sequence...")
-#         frame_count = length(seq)
-
-#         seq
-#         |> Enum.with_index()
-#         |> Enum.each(fn {img_path, index} -> Process.put(:"img_#{index}", read_frame(img_path)) end)
-
-#         IO.puts("Avispish: Looper starting...")
-
-#         loop(display, frame_count)
-#       end,
-#       [{:priority, :max}, {:min_heap_size, 4_000_000}, {:min_bin_vheap_size, 4_000_000}]
-#     )
-#   end
-
-#   def play(looper_pid) do
-#     send(looper_pid, :play)
-#   end
-
-#   def stop(looper_pid) do
-#     send(looper_pid, :stop)
-#   end
-
-#   defp loop(display, size) do
-#     receive do
-#       :play ->
-#         IO.puts("Avispish: Looper playing...")
-#         send(self(), {:tick, 0, size})
-
-#         loop(display, size)
-
-#       {:tick, index, size} ->
-#         render_frame(display, Process.get(:"img_#{index}"))
-#         Process.send_after(self(), {:tick, next_index(index, size), size}, 1)
-
-#         loop(display, size)
-
-#       :stop ->
-#         IO.puts("Avispish: Looper stopped!")
-#         :ok
-#     end
-#   end
-
-#   defp read_frame(path) do
-#     path
-#     |> CV.imread()
-#     |> CV.rotate(CV.RotateFlags.cv_ROTATE_90_CLOCKWISE())
-#     |> CV.Mat.to_binary()
-#   end
-
-#   defp render_frame(display, img_frame) do
-#     ST7789.display(display, img_frame, :bgr)
-#   end
-
-#   defp next_index(current_index, size) when current_index >= size - 1 do
-#     0
-#   end
-
-#   defp next_index(current_index, _size) do
-#     current_index + 1
-#   end
-# end
 ```
 
 ## 📺 Run
 
 ```elixir
-seq_name = read_text("Seq File Name (without .zip extension)")
-```
-
-```elixir
-start_button = Kino.Control.button("Start")
-play_button = Kino.Control.button("Play")
-stop_button = Kino.Control.button("Stop")
-
-Kino.render(start_button)
-Kino.render(play_button)
-Kino.render(stop_button)
-
-Kino.listen(start_button, fn %{type: :click} ->
-  if seq_name == "", do: raise "Please fill out Seq File Name first..."
-
-  disp = AvispishLooper.create_display()
-  seq = AvispishLooper.load_seq(seq_name)
-  looper_pid = AvispishLooper.start(disp, seq)
-
-  Kino.listen(play_button, fn %{type: :click} -> AvispishLooper.play(looper_pid) end)
-  Kino.listen(stop_button, fn %{type: :click} -> AvispishLooper.stop(looper_pid) end)
-end)
-
-```
-
-```elixir
 start_button = Kino.Control.button("🚀 Start")
-stop_button = Kino.Control.button("⏹️ Stop")
+restart_button = Kino.Control.button("🔄 Restart")
 play_button = Kino.Control.button("▶️ Play")
-pause_button = Kino.Contro.button("⏸️ Pause")
+pause_button = Kino.Control.button("⏸️ Pause")
 
-player_controls = Kino.Layout.grid([start_button, stop_button, play_button, pause_button], columns: 2, boxed: true)
+player_controls = Kino.Layout.grid([start_button, restart_button, play_button, pause_button], columns: 4, boxed: true)
 
 load_form = Kino.Control.form([seq_file: Kino.Input.file("Seq File", accept: [".zip"])], submit: "Load")
 
@@ -195,16 +51,17 @@ tabs =
 
 Kino.listen(load_form, fn %{type: :submit, data: %{seq_file: %{file_ref: zip_ref}}} ->
   seq_zip = Kino.Input.file_path(zip_ref)
-
-  IO.puts("load: #{inspect(AvispishLooper.load(seq_zip))}")
+  
+  IO.puts("Load: #{inspect(AvispishLooper.load(seq_zip))}")
 end)
 
 Kino.listen(start_button, fn %{type: :click} -> IO.puts("start: #{inspect(AvispishLooper.start())}") end)
-Kino.listen(stop_button, fn %{type: :click} -> IO.puts("stop: #{inspect(AvispishLooper.stop())}") end)
+Kino.listen(restart_button, fn %{type: :click} -> IO.puts("stop: #{inspect(AvispishLooper.stop())}") end)
 Kino.listen(play_button, fn %{type: :click} -> IO.puts("play: #{inspect(AvispishLooper.play())}") end)
 Kino.listen(pause_button, fn %{type: :click} -> IO.puts("pause: #{inspect(AvispishLooper.pause())}") end)
 
-Kino.render(tabs)
+tabs
+
 ```
 
-<!-- livebook:{offset":5129,"stamp":{"token":"XCP.H_Xi59xcm1CEL5U2unSy_jCuGZqRcXzPa1PW82yZsr2A86eYB6FeZyHyx3i2swPOxwdhopJG6a3tUBPIDBcEYimPOqNvMxbQM1fhfkt2xlKLvsAIzxJRJeII","version":2}} -->
+<!-- livebook:{"offset":1794,"stamp":{"token":"XCP.S0CKamjH4uOoWuWBuefsch5Mlx_SfcOnIrCFTGj85S-bGlT2lhX8dVxRjqDUC3_vQT0sFa4hknv5J6YmBIfdgWksYiZyUnUXUpYuZk7d23aJVCBGzPB3r40","version":2}} -->
